@@ -25,7 +25,7 @@ class BlogPost(models.Model):
         max_length=50, choices=Categories.choices, default=Categories.WORLD)
     thumbnail = models.ImageField(upload_to='photos/%y/%m/%d/')
     excerpt = models.CharField(max_length=150)
-    month = models.CharFIeld(max_length=3)
+    month = models.CharField(max_length=3)
     day = models.CharField(max_length=2)
     content = models.TextField()
     featured = models.BooleanField(default=False)
@@ -44,4 +44,16 @@ class BlogPost(models.Model):
 
         self.slug = slug
 
+        if self.featured:
+            try:
+                temp = BlogPost.objects.get(featured=True)
+                if self != temp:
+                    temp.featured = False
+                    temp.save()
+            except BlogPost.DoesNotExist:
+                pass
+        super(BlogPost, self).save(*args, **kwargs)
+
+    def __str__(self):
+        return self.title
         #   first-blog-post-1 .... first-blog-post-n
